@@ -32,4 +32,16 @@ public class GlobalExceptionHandler {
                         LocalDateTime.now()
                 ));
     }
+
+    @ExceptionHandler(InvalidTransferException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTransfer(
+            InvalidTransferException ex) {
+
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(
+                        "INVALID_TRANSFER",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
 }

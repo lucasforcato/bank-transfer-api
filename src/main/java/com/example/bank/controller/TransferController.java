@@ -4,6 +4,7 @@ package com.example.bank.controller;
 import com.example.bank.dto.TransferRequest;
 import com.example.bank.dto.TransferResponse;
 import com.example.bank.service.TransferService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class TransferController {
 
     @PostMapping
     public ResponseEntity<TransferResponse> transfer(
-            @RequestBody TransferRequest request) {
+            @Valid @RequestBody TransferRequest request) {
 
         transferService.transfer(request);
 

@@ -3,6 +3,7 @@ package com.example.bank.service;
 
 import com.example.bank.dto.TransferRequest;
 import com.example.bank.entity.*;
+import com.example.bank.exception.InvalidTransferException;
 import com.example.bank.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,10 @@ public class TransferService {
                         new AccountNotFoundException(r.destinationAccountId()));
         if (src.getBalance().compareTo(r.amount()) < 0) {
             throw new InsufficientBalanceException(src.getId());
+        }
+        if (r.sourceAccountId().equals(r.destinationAccountId())) {
+            throw new InvalidTransferException(
+                    "Source and destination accounts must be different");
         }
         src.setBalance(src.getBalance().subtract(r.amount()));
         dst.setBalance(dst.getBalance().add(r.amount()));
