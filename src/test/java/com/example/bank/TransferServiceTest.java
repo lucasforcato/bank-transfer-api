@@ -1,19 +1,23 @@
 package com.example.bank;
 
+import com.example.bank.dto.TransactionResponse;
 import com.example.bank.dto.TransferRequest;
 import com.example.bank.entity.Account;
+import com.example.bank.entity.Transaction;
 import com.example.bank.exception.AccountNotFoundException;
 import com.example.bank.exception.InsufficientBalanceException;
 import com.example.bank.repository.AccountRepository;
 import com.example.bank.repository.TransactionRepository;
 import com.example.bank.service.NotificationService;
+import com.example.bank.service.TransactionService;
 import com.example.bank.service.TransferService;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class TransferServiceTest {
@@ -118,5 +122,93 @@ class TransferServiceTest {
 
         verify(tr, never()).save(any());
         verify(ns, never()).notifyTransfer(anyLong());
+    }
+
+    @Test
+    void shouldReturnTransactionsByAccountId() {
+
+        TransactionRepository repository =
+                mock(TransactionRepository.class);
+
+        TransactionService service =
+                new TransactionService(repository);
+
+        Transaction transaction = Transaction.builder()
+                .id(1L)
+                .sourceAccountId(1L)
+                .destinationAccountId(2L)
+                .amount(new BigDecimal("100"))
+                .build();
+
+        when(repository
+                .findBySourceAccountIdOrDestinationAccountId(
+                        1L,
+                        1L))
+                .thenReturn(List.of(transaction));
+
+        List<TransactionResponse> result =
+                service.findByAccountId(1L);
+
+        assertEquals(1, result.size());
+
+        assertEquals(
+                1L,
+                result.get(0).sourceAccountId()
+        );
+
+        verify(repository)
+                .findBySourceAccountIdOrDestinationAccountId(
+                        1L,
+                        1L
+                );
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenAccountHasNoTransactions() {
+
+        TransactionRepository repository =
+                mock(TransactionRepository.class);
+
+        TransactionService service =
+                new TransactionService(repository);
+
+        when(repository
+                .findBySourceAccountIdOrDestinationAccountId(
+                        1L,
+                        1L))
+                .thenReturn(List.of());
+
+        List<TransactionResponse> result =
+                service.findByAccountId(1L);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnAllTransactions() {
+
+        TransactionRepository repository =
+                mock(TransactionRepository.class);
+
+        TransactionService service =
+                new TransactionService(repository);
+
+        Transaction t1 = Transaction.builder()
+                .id(1L)
+                .build();
+
+        Transaction t2 = Transaction.builder()
+                .id(2L)
+                .build();
+
+        when(repository.findAll())
+                .thenReturn(List.of(t1, t2));
+
+        List<TransactionResponse> result =
+                service.findAll();
+
+        assertEquals(2, result.size());
+
+        verify(repository).findAll();
     }
 }

@@ -36,14 +36,14 @@ public class TransferService {
         dst.setBalance(dst.getBalance().add(r.amount()));
         accountRepository.save(src);
         accountRepository.save(dst);
-       transactionRepository.save(
-                Transaction.builder()
-                        .sourceAccountId(src.getId())
-                        .destinationAccountId(dst.getId())
-                        .amount(r.amount())
-                        .createdAt(LocalDateTime.now())
-                        .build()
-        );
+        Transaction transaction = Transaction.builder()
+                .sourceAccountId(src.getId())
+                .destinationAccountId(dst.getId())
+                .amount(r.amount())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        transactionRepository.save(transaction);
         notificationService.notifyTransfer(src.getId());
     }
 }
