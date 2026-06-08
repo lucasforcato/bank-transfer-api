@@ -4,18 +4,17 @@ package com.example.bank.controller;
 import com.example.bank.dto.*;
 import com.example.bank.entity.Account;
 import com.example.bank.service.AccountService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/accounts")
+@RequiredArgsConstructor
 public class AccountController {
-    private final AccountService service;
 
-    public AccountController(AccountService s) {
-        service = s;
-    }
+    private final AccountService service;
 
     @PostMapping
     public Account create(@RequestBody CreateAccountRequest r) {
